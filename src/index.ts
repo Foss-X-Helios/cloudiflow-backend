@@ -3,6 +3,7 @@ import { sign, jwt } from 'hono/jwt';
 import 'dotenv/config';
 import { rbacMiddleware } from './middleware/auth';
 import { projectOrgRouter } from './services/projectOrg';
+import { cloudConnectorRouter } from './services/cloudConnector';
 
 import { logger } from 'hono/logger';
 
@@ -30,6 +31,7 @@ const api = new Hono();
 api.use('/*', jwt({ secret: jwtSecret, alg: 'HS256' }));
 
 api.route('/', projectOrgRouter);
+api.route('/connectors', cloudConnectorRouter);
 
 api.get('/admin/users', rbacMiddleware(['admin']), (c) => {
   return c.json({ message: 'Admin only route - user list' });
