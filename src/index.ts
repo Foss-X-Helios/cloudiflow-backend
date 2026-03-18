@@ -2,6 +2,7 @@ import { Hono } from 'hono';
 import { sign, jwt } from 'hono/jwt';
 import 'dotenv/config';
 import { rbacMiddleware } from './middleware/auth';
+import { projectOrgRouter } from './services/projectOrg';
 
 import { logger } from 'hono/logger';
 
@@ -28,10 +29,7 @@ app.post('/api/login', async (c) => {
 const api = new Hono();
 api.use('/*', jwt({ secret: jwtSecret, alg: 'HS256' }));
 
-api.get('/projects', (c) => {
-  const payload = c.get('jwtPayload');
-  return c.json({ message: 'List of projects', user: payload });
-});
+api.route('/', projectOrgRouter);
 
 api.get('/admin/users', rbacMiddleware(['admin']), (c) => {
   return c.json({ message: 'Admin only route - user list' });
