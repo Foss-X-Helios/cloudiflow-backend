@@ -4,6 +4,7 @@ import 'dotenv/config';
 import { rbacMiddleware } from './middleware/auth';
 import { projectOrgRouter } from './services/projectOrg';
 import { cloudConnectorRouter } from './services/cloudConnector';
+import { dagCodegenRouter } from './services/dagCodegen';
 
 import { logger } from 'hono/logger';
 
@@ -32,6 +33,7 @@ api.use('/*', jwt({ secret: jwtSecret, alg: 'HS256' }));
 
 api.route('/', projectOrgRouter);
 api.route('/connectors', cloudConnectorRouter);
+api.route('/codegen', dagCodegenRouter);
 
 api.get('/admin/users', rbacMiddleware(['admin']), (c) => {
   return c.json({ message: 'Admin only route - user list' });
