@@ -6,6 +6,8 @@ import { projectOrgRouter } from './services/projectOrg';
 import { cloudConnectorRouter } from './services/cloudConnector';
 import { dagCodegenRouter } from './services/dagCodegen';
 import { costEstimatorRouter } from './services/costEstimator';
+import { deploymentRunnerRouter } from './services/deploymentRunner';
+import './workers/deploymentWorker';
 
 import { logger } from 'hono/logger';
 
@@ -36,6 +38,7 @@ api.route('/', projectOrgRouter);
 api.route('/connectors', cloudConnectorRouter);
 api.route('/codegen', dagCodegenRouter);
 api.route('/cost', costEstimatorRouter);
+api.route('/deploy', deploymentRunnerRouter);
 
 api.get('/admin/users', rbacMiddleware(['admin']), (c) => {
   return c.json({ message: 'Admin only route - user list' });
