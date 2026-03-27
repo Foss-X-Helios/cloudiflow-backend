@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import { sign, jwt } from 'hono/jwt';
+import { sign, jwt, verify } from 'hono/jwt';
 import 'dotenv/config';
 import { rbacMiddleware } from './middleware/auth';
 import { projectOrgRouter } from './services/projectOrg';
@@ -32,7 +32,27 @@ app.post('/api/login', async (c) => {
 });
 
 const api = new Hono();
-api.use('/*', jwt({ secret: jwtSecret, alg: 'HS256' }));
+const jwtMiddleware = jwt({ secret: jwtSecret, alg: 'HS256' });
+api.use('/*', async (c, next) => {
+  const authHeader = c.req.header('authorization');
+  if (authHeader) {
+    return jwtMiddleware(c, next);
+  }
+
+  const isDeploymentEventsRoute = /\/deploy\/[^/]+\/events$/.test(c.req.path);
+  const queryToken = c.req.query('token');
+  if (isDeploymentEventsRoute && queryToken) {
+    try {
+      await verify(queryToken, jwtSecret, 'HS256');
+      await next();
+      return;
+    } catch {
+      return c.json({ error: 'Unauthorized' }, 401);
+    }
+  }
+
+  return c.json({ error: 'Unauthorized' }, 401);
+});
 
 api.route('/', projectOrgRouter);
 api.route('/connectors', cloudConnectorRouter);
