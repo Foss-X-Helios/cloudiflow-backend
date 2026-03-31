@@ -89,7 +89,6 @@ dagCodegenRouter.post('/generate', async (c) => {
     const sortedNodes = topologicalSort(body.nodes, body.edges);
     const hcl = generateTerraformHCL(sortedNodes);
     
-    // TBD: optionally upload to S3 if requested
     return c.json({ 
       message: 'Successfully generated IaC',
       order: sortedNodes.map(n => n.id),

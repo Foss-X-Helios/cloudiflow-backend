@@ -71,4 +71,3 @@ Bun.serve({
   port,
   fetch: app.fetch,
 });
-console.log(`Server is running on port ${port}`);
